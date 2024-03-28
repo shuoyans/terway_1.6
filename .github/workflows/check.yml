@@ -1,0 +1,85 @@
+name: check
+
+on:
+  push: { }
+  pull_request: { }
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.after }}
+  cancel-in-progress: true
+
+jobs:
+  go-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: 1.20.6
+    - uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Test
+      run: |
+        sudo go test -tags default_build,privileged -v ./...
+        sudo go test -tags default_build,privileged -race -v ./...
+        sudo go test -tags default_build,privileged -coverpkg=./... -race -coverprofile=coverage.txt -covermode=atomic ./...
+    - uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.txt
+        flags: unittests
+        name: codecov-terway
+        fail_ci_if_error: true
+        verbose: true
+
+  go-mod:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: 1.20.6
+    - uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Check module vendoring
+      run: |
+        go mod tidy
+        go mod vendor
+        git diff --exit-code || (echo "please run 'go mod tidy && go mod vendor', and submit your changes"; exit 1)
+
+  go-lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version: 1.20.6
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: v1.53
+        args: --config=.golangci.yml
+
+  super-linter:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Lint Code Base
+      uses: super-linter/super-linter@v5.1.1
+      env:
+        VALIDATE_ALL_CODEBASE: true
+        VALIDATE_MARKDOWN: true
+        VALIDATE_BASH: true
+        DEFAULT_BRANCH: main
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        FILTER_REGEX_EXCLUDE: .*(test|tests).*
+        SHELLCHECK_OPTS: "-e SC2166"
