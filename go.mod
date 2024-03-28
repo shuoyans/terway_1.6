@@ -6,7 +6,7 @@ require (
 	github.com/Jeffail/gabs/v2 v2.7.0
 	github.com/Microsoft/go-winio v0.6.0
 	github.com/Microsoft/hcsshim v0.9.9
-	github.com/alexflint/go-filemutex v1.2.0
+	github.com/alexflint/go-filemutex v1.3.0
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.215
 	github.com/boltdb/bolt v1.3.1
 	github.com/containernetworking/cni v1.1.2
@@ -30,7 +30,7 @@ require (
 	go.uber.org/atomic v1.9.0
 	golang.org/x/net v0.10.0
 	golang.org/x/sync v0.2.0
-	golang.org/x/sys v0.8.0
+	golang.org/x/sys v0.16.0
 	gomodules.xyz/jsonpatch/v2 v2.3.0
 	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.30.0
