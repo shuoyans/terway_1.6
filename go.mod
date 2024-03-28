@@ -23,7 +23,7 @@ require (
 	github.com/prometheus/client_golang v1.15.1
 	github.com/pterm/pterm v0.12.62
 	github.com/samber/lo v1.38.1
-	github.com/sirupsen/logrus v1.9.0
+	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	github.com/vishvananda/netlink v1.2.1-beta.2
